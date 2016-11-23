@@ -40,7 +40,6 @@ class Store extends Model
             ->select();
     }
 
-
     /**
      * 查询(一条)
      * @param array $where 查询条件

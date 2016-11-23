@@ -18,10 +18,8 @@ class User extends Model
      */
     public function toAdd($data)
     {
-        $user = new User;
-        $user->data($data);
-        $user->save();
-        return $user->user_id;
+        Db::name('user')->insert($data);
+        return Db::name('user')->getLastInsID();
     }
 
     /**

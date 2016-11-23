@@ -36,10 +36,8 @@ class Passport extends Model
      */
     protected function toAdd($data)
     {
-        $passport = new Passport;
-        $passport->data($data);
-        $passport->save();
-        return $passport->id;
+        Db::name('passport')->insert($data);
+        return Db::name('passport')->getLastInsID();
     }
 
     /**
