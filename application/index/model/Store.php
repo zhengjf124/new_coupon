@@ -3,6 +3,7 @@
 namespace app\index\model;
 
 use think\Model;
+use think\Db;
 
 class Store extends Model
 {
@@ -17,40 +18,7 @@ class Store extends Model
      */
     public function toCount($where)
     {
-        return db('store')->where($where)->count();
-    }
-
-    /**
-     * 添加
-     * @param array $data 需要保存的数据
-     */
-    public function toAdd($data)
-    {
-        $test = new Test;
-        $test->data($data);
-        $test->save();
-        return $test->id;
-    }
-
-    /**
-     * 修改
-     * @param $where
-     * @param $data
-     * @return false|int
-     */
-    public function toUpdate($where, $data)
-    {
-        return Test::save($data, $where);
-    }
-
-    /**
-     * 删除
-     * @param $where
-     * @return int
-     */
-    public function toDelete($where)
-    {
-        return Test::destroy($where);
+        return Db::name('store')->where($where)->count();
     }
 
     /**
@@ -65,8 +33,7 @@ class Store extends Model
      */
     public function toSelect($where, $field, $firstRow, $listRows, $key = 'sort_order', $sort = 'ASC')
     {
-        $store = new Store;
-        return $store->where($where)
+        return Db::name('store')->where($where)
             ->field($field)
             ->order($key, $sort)
             ->limit($firstRow, $listRows)
@@ -82,6 +49,6 @@ class Store extends Model
      */
     public function toFind($where, $field)
     {
-        return db('store')->where($where)->field($field)->find();
+        return Db::name('store')->where($where)->field($field)->find();
     }
 }

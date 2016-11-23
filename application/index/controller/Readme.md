@@ -40,6 +40,8 @@ shop基本约定，接口使用http协议get/post请求，返回数据均使用J
 [注册登录短信接口](classapp_1_1index_1_1controller_1_1_user.html)\n
 [分类接口](classapp_1_1index_1_1controller_1_1_category.html)\n
 [区域接口](classapp_1_1index_1_1controller_1_1_area.html)\n
+[收藏接口](classapp_1_1index_1_1controller_1_1_collect.html)\n
+
 
 \n
 \n

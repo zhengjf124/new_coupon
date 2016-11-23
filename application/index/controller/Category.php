@@ -40,7 +40,6 @@ class Category extends Api
      */
     public function onceList()
     {
-        $this->_createParameters();//不需要提交参数
         $cat = new \app\index\model\Category;
         $list = $cat->toSelect('parent_id=0');//查分类表
         $this->_returnData(['list' => $list]);
@@ -73,12 +72,11 @@ class Category extends Api
      */
     public function secondList()
     {
-        $param = $this->_createParameters('cat_id');
-        if (!preg_match('/^[1-9][0-9]*$/', $param['cat_id'])) {
+        if (!preg_match('/^[1-9][0-9]*$/', $this->_getParams('cat_id'))) {
             $this->_returnError('1', '分类ID不正确');
         }
         $cat = new \app\index\model\Category;
-        $list = $cat->toSelect('parent_id=' . $param['cat_id']);//查分类表
+        $list = $cat->toSelect('parent_id=' . $this->_getParams('cat_id'));//查分类表
         $this->_returnData(['list' => $list]);
     }
 

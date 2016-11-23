@@ -31,7 +31,6 @@ class Area extends Api
      */
     public function city()
     {
-        $this->_createParameters('');//不需要参数
         $area = new \app\index\model\Area;
         $list = $area->toSelect(['type' => 3], 'area_id as city_id,name as city_name');
         $this->_returnData(['list' => $list]);
@@ -61,12 +60,11 @@ class Area extends Api
      */
     public function district()
     {
-        $param = $this->_createParameters('city_id');
-        if (!preg_match('/^[1-9][0-9]*$/', $param['city_id'])) {
+        if (!preg_match('/^[1-9][0-9]*$/', $this->_getParams('city_id'))) {
             $this->_returnError(10020, '城市ID不合法');
         }
         $area = new \app\index\model\Area;
-        $list = $area->selectDistrict($param['city_id']);
+        $list = $area->selectDistrict($this->_getParams('city_id'));
         $this->_returnData(['list' => $list]);
     }
 
@@ -93,12 +91,11 @@ class Area extends Api
      */
     public function tradingArea()
     {
-        $param = $this->_createParameters('district_id');
-        if (!preg_match('/^[1-9][0-9]*$/', $param['district_id'])) {
+        if (!preg_match('/^[1-9][0-9]*$/', $this->_getParams('district_id'))) {
             $this->_returnError(10021, '县区ID不合法');
         }
         $area = new \app\index\model\Area;
-        $list = $area->selectTradingArea($param['district_id']);
+        $list = $area->selectTradingArea($this->_getParams('district_id'));
         $this->_returnData(['list' => $list]);
     }
 }

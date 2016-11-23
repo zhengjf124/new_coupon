@@ -3,6 +3,7 @@
 namespace app\index\model;
 
 use think\Model;
+use think\Db;
 
 class Passport extends Model
 {
@@ -58,7 +59,7 @@ class Passport extends Model
      */
     public function findPassport($user_id)
     {
-        return db('passport')->where(['user_id' => $user_id])->value('passport');
+        return Db::name('passport')->where(['user_id' => $user_id])->value('passport');
     }
 
     /**
@@ -68,6 +69,6 @@ class Passport extends Model
      */
     public function findUserId($passport)
     {
-        return db('passport')->where(['passport' => $passport])->value('user_id');
+        return Db::name('passport')->where(['passport' => $passport])->value('user_id');
     }
 }

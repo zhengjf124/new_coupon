@@ -20,7 +20,7 @@ class Area extends Model
      */
     public function toSelect($where, $field)
     {
-        return db('china_area')->where($where)->field($field)->select();
+        return Db::name('china_area')->where($where)->field($field)->select();
     }
 
     /**
@@ -40,7 +40,7 @@ class Area extends Model
      */
     public function selectTradingArea($district_id)
     {
-        return db('trading_area')->where(['district_id' => $district_id])->field('area_id as trading_id,area_name as trading_name')->select();
+        return Db::name('trading_area')->where(['district_id' => $district_id])->field('area_id as trading_id,area_name as trading_name')->select();
     }
 
 }

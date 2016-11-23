@@ -3,6 +3,7 @@
 namespace app\index\model;
 
 use think\Model;
+use think\Db;
 
 class User extends Model
 {
@@ -24,49 +25,12 @@ class User extends Model
     }
 
     /**
-     * 修改
-     * @param $where
-     * @param $data
-     * @return false|int
-     */
-    public function toUpdate($where, $data)
-    {
-        return Test::save($data, $where);
-    }
-
-    /**
-     * 删除
-     * @param $where
-     * @return int
-     */
-    public function toDelete($where)
-    {
-        return Test::destroy($where);
-    }
-
-    /**
-     * 查询
-     * @param $where
-     * @param $field
-     * @return false|\PDOStatement|string|\think\Collection
-     */
-    public function toSelect($where, $field)
-    {
-        $test = new User;
-        return $test->where($where)
-            ->field($field)
-            ->order('id', 'desc')
-            ->select();
-    }
-
-    /**
      * 查询
      * @return false|\PDOStatement|string|\think\Collection
      */
     public function toFind($where, $field = 'user_id')
     {
-        $test = new User;
-        return $test->where($where)
+        return Db::name('user')->where($where)
             ->field($field)
             ->find();
     }

@@ -48,32 +48,32 @@ class Store extends Api
     public function getList()
     {
 
-        $param = $this->_createParameters('city_id,page,list_rows,trading_id,cat_id,sort_id');
-        if (!preg_match('/^[1-9][0-9]*$/', $param['city_id'])) {
+        //$param = $this->_createParameters('city_id,page,list_rows,trading_id,cat_id,sort_id');
+        if (!preg_match('/^[1-9][0-9]*$/', $this->_getParams('city_id'))) {
             $this->_returnError(10020, '城市ID不合法');
         }
 
-        $nowPage = $param['page'];//当前页码
+        $nowPage = $this->_getParams('page');//当前页码
         if (!preg_match('/^[1-9][0-9]*$/', $nowPage)) {
             $this->_returnError(10040, '页码不合法');
         }
 
-        $listRows = $param['list_rows'];//一页的条数
+        $listRows = $this->_getParams('list_rows');//一页的条数
         if (!preg_match('/^[1-9][0-9]*$/', $listRows)) {
             $this->_returnError(10046, '一页条数不合法');
         }
 
-        if (preg_match('/^[1-9][0-9]*$/', $param['cat_id'])) {
+        if (preg_match('/^[1-9][0-9]*$/', $this->_getParams('cat_id'))) {
             $cat_model = new \app\index\model\Category;
-            $cat_ids = $cat_model->selectCatId(['parent_id' => $param['cat_id'], 'is_show' => 1]);
-            $cat_ids[] = $param['cat_id'];
+            $cat_ids = $cat_model->selectCatId(['parent_id' => $this->_getParams('cat_id'), 'is_show' => 1]);
+            $cat_ids[] = $this->_getParams('cat_id');
             $where['cat_id'] = array('in', $cat_ids);
         }
 
-        if (preg_match('/^[1-9][0-9]*$/', $param['trading_id'])) {
-            $where['trading_id'] = $param['trading_id'];
+        if (preg_match('/^[1-9][0-9]*$/', $this->_getParams('trading_id'))) {
+            $where['trading_id'] = $this->_getParams('trading_id');
         } else {
-            $where['city_id'] = $param['city_id'];
+            $where['city_id'] = $this->_getParams('city_id');
         }
 
         /*        if (!preg_match('/^[1-9][0-9]*$/', $this->_parameters['sort_id'])) {
@@ -158,13 +158,12 @@ class Store extends Api
      */
     public function detail()
     {
-        //return json(['/Public/upload/goods/2016/11-04/581bfd282706a.png']);
-        $param = $this->_createParameters('store_id,passport');
-        if (!preg_match('/^[1-9][0-9]*$/', $param['store_id'])) {
+        $store_id = $this->_getParams('store_id');
+        if (!preg_match('/^[1-9][0-9]*$/', $store_id)) {
             $this->_returnError(10042, '商家ID不合法');
         }
         $store_model = new \app\index\model\Store;
-        $where = ['store_id' => $param['store_id'], 'is_delete' => 0];
+        $where = ['store_id' => $store_id, 'is_delete' => 0];
         $field = 'store_id,store_name,comment_count,label,keywords,avg_price,store_banner,store_phone,address';
         $store_detail = $store_model->toFind($where, $field);
         if (!$store_detail || !is_array($store_detail)) {
@@ -180,18 +179,20 @@ class Store extends Api
         $store_detail['distance'] = '<500m';//距离
         $store_detail['collect'] = 0;//未收藏
 
-        if (preg_match('/^[0-9a-zA-Z]{32}$/', $param['passport'])) {
+        $passport = $this->_getParams('passport');
+        if (preg_match('/^[0-9a-zA-Z]{32}$/', $passport)) {
             $passport_model = new \app\index\model\Passport;
-            $user_id = $passport_model->findUserId($param['passport']);
+            $user_id = $passport_model->findUserId($passport);
             if ($user_id) {
-                //收藏部分未完成
-                //$collect_info = M('store_favorite')->where(array('user_id' => $user_id, 'store_id' => $store_detail['store_id']))->field('collect_id')->find();
-                //if ($collect_info) {
-                //$store_detail['collect'] = 1;//已收藏
-                //}
+                $collect_model = new \app\index\model\Collect;
+                //获取用户收藏的所有商家ID
+                $all_store_id = $collect_model->getStoreId($user_id);
+                if (in_array($store_detail['store_id'], $all_store_id)) {
+                    $store_detail['collect'] = 1;//已收藏
+                }
             }
         }
-
+        //优惠券列表部分未完成
         /*        $coupon_ids = M('coupons_store')->where(array('store_id' => $store_detail['store_id']))->getField('coupon_id', true);
                 if ($coupon_ids) {
                     $coupon_list = M('coupons_sale')->where(array('coupon_id' => array('in', $coupon_ids), 'is_delete' => 0))->field('coupon_id,coupon_name,coupon_price,market_price,coupon_sales,coupon_img')->order('sort_order')->select();

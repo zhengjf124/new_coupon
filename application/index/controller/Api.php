@@ -10,14 +10,29 @@ use think\Request;
 class Api extends Controller
 {
     protected $_now;//当前时间
+    private $_parameters;//参数
 
     public function _initialize()
     {
         parent::_initialize();
         header("Access-Control-Allow-Origin: *");//允许跨域
+        $this->_parameters = $this->_createParameters();//获取参数
         $this->_now = time();
     }
 
+    /**
+     * 获取参数
+     * @param string $key 键
+     * @return null
+     */
+    protected function _getParams($key)
+    {
+        if (isset($this->_parameters[$key])) {
+            return $this->_parameters[$key];
+        } else {
+            return null;
+        }
+    }
 
     /**
      * 获取参数，同时检查令牌正确性
@@ -26,37 +41,24 @@ class Api extends Controller
      * @param string $key 字段名称 用逗号隔开，如 'id,name,sex'
      * @return string
      */
-    protected function _createParameters($key = '')
+    protected function _createParameters()
     {
-        if ($key == '') {
-            $sys_sign = md5(AUTH_KEY);
-            $param = [];
-        } else {
-            //获取所有数据
-            $data = Request::instance()->param();
-            if (!isset($data)) {
-                $this->_returnError(10001, 'sign不合法');
-            }
-            $parameters = explode(',', $key);
-            $param = [];
-            foreach ($parameters as $item) {
-                if (isset($data[$item])) {
-                    $param[$item] = $data[$item];
-                } else {
-                    $param[$item] = '';
-                }
-            }
-            unset($item);
-            $param['token'] = AUTH_KEY;
-            ksort($param);//根据键值升序排列
-            $sign = '';
-            foreach ($param as $value) {
-                $sign .= $value . '&';
-            }
-            $sign = trim($sign, '&');
-            $sys_sign = md5($sign);
-            unset($param['token']);
+        //获取所有数据
+        $data = Request::instance()->param();
+        if (!isset($data['sign'])) {
+            $this->_returnError(10001, 'sign不合法');
         }
+        unset($data['sign']);
+        $param = $data;
+        $param['token'] = AUTH_KEY;
+        ksort($param);//根据键值升序排列
+        $sign = '';
+        foreach ($param as $value) {
+            $sign .= $value . '&';
+        }
+        $sign = trim($sign, '&');
+        $sys_sign = md5($sign);
+        unset($param['token']);
 
         $user_sign = Request::instance()->param('sign', '');
 
