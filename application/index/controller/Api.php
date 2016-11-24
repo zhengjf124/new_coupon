@@ -83,7 +83,7 @@ class Api extends Controller
         echo json_encode([
             'code' => $code,
             'reason' => $message
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
         die();
     }
 

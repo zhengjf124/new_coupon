@@ -26,6 +26,7 @@ Route::rule([
     '/area/trading' => 'index/Area/tradingArea',
     '/store/list' => 'index/Store/getList',
     '/store/detail' => 'index/Store/detail',
+    '/store/sort' => 'index/store/getSort',
     '/collect/store' => 'index/Collect/store',
     '/collect/coupon' => 'index/Collect/coupon',
     '/coupon/detail' => 'index/coupon/detail',

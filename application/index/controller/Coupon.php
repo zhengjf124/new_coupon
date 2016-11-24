@@ -27,15 +27,17 @@ class Coupon extends Api
      * coupon_detail:
      *      name    |  type  | description
      * -------------|--------|----------------------
-     *   coupon_id  |  int   |  优惠券ID
-     *  coupon_name | string |  优惠券名称
-     *  coupon_desc | string |  描述
-     * market_price | float  |  原价
-     * coupon_price | float  |  实际价格
-     * coupon_sales |  int   |  销量
-     * coupon_banner| string |  详情页图片
-     * coupon_detail| string |  详细介绍
-     *   collect    |  int   |  是否收藏 0-未收藏、1-已收藏
+     * coupon_id    | int    |  优惠券ID
+     * coupon_name  | string |  优惠券名称
+     * coupon_desc  | string |  描述
+     * market_price | decimal|  原价
+     * coupon_price | decimal|  实际价格
+     * coupon_sales | int    |  销量
+     * coupon_banner| array  |  详情页图片
+     * use_time     | string |  使用时间
+     * use_rule     | string |  使用规则
+     * collect      | int    |  是否收藏 0-未收藏、1-已收藏
+     * validity     | string |  有效期
      *
      * store_list:
      *      name    |  type  | description
@@ -60,13 +62,13 @@ class Coupon extends Api
 
         $coupon_model = new \app\index\model\Coupon;
         $where = ['coupon_id' => $coupon_id, 'is_delete' => 0];
-        $field = 'coupon_id,coupon_name,coupon_desc,market_price,coupon_price,coupon_sales,coupon_banner,coupon_detail';
+        $field = 'coupon_id,coupon_name,coupon_desc,market_price,coupon_price,coupon_sales,coupon_banner,start_time,end_time,use_time,use_rule,validity_remarks';
         $coupon_detail = $coupon_model->toFind($where, $field);
 
         if (!$coupon_detail || !is_array($coupon_detail)) {
             $this->_returnError(10045, '优惠券不存在');
         }
-        $coupon_detail['coupon_detail'] = htmlspecialchars_decode($coupon_detail['coupon_detail']);
+        $coupon_detail['use_rule'] = htmlspecialchars_decode($coupon_detail['use_rule']);
         $coupon_detail['coupon_banner'] = json_decode($coupon_detail['coupon_banner']);
         $coupon_detail['collect'] = 0;//未收藏
 
@@ -83,22 +85,23 @@ class Coupon extends Api
                 }
             }
         }
+        $coupon_detail['validity'] = date('Y.m.d', $coupon_detail['start_time']) . '至' . date('Y.m.d', $coupon_detail['end_time']);
+        if (!empty($coupon_detail['validity_remarks'])) {
+            $coupon_detail['validity'] .= '(' . $coupon_detail['validity_remarks'] . ')';
+        }
+        unset($coupon_detail['start_time']);
+        unset($coupon_detail['end_time']);
+        unset($coupon_detail['validity_remarks']);
 
-        /*        $store_ids = M('coupons_store')->where(array('coupon_id' => $coupon_detail['coupon_id']))->getField('store_id', true);
-                if ($store_ids) {
-                    $store_list = M('store')->where(array('store_id' => array('in', $store_ids), 'is_delete' => 0))->field('store_id,store_name,comment_count,store_phone,address')->order('sort_order')->select();
-                    if ($store_list) {
-                        foreach ($store_list as &$value) {
-                            $value['comment_level'] = 3;//评论等级0-5 0代表 无评论 1-5分别代表1到5颗星
-                            $value['distance'] = '<500m';//距离
-                        }
-                        unset($value);
-                    }
-                }*/
-
-        //商品列表未完成
-        if (!isset($store_list)) {
-            $store_list = [];
+        $store_model = new \app\index\model\Store;
+        $store_ids = $store_model->findStoreId($coupon_detail['coupon_id']);
+        $store_list = $store_model->toSelect(['store_id' => ['in', $store_ids]], 'store_id,store_name,comment_count,store_phone,address', 0, 20);
+        if ($store_list) {
+            foreach ($store_list as &$value) {
+                $value['comment_level'] = 3;//评论等级0-5 0代表 无评论 1-5分别代表1到5颗星
+                $value['distance'] = '<500m';//距离
+            }
+            unset($value);
         }
 
         return json([

@@ -41,6 +41,8 @@ shop基本约定，接口使用http协议get/post请求，返回数据均使用J
 [分类接口](classapp_1_1index_1_1controller_1_1_category.html)\n
 [区域接口](classapp_1_1index_1_1controller_1_1_area.html)\n
 [收藏接口](classapp_1_1index_1_1controller_1_1_collect.html)\n
+[门店相关接口](classapp_1_1index_1_1controller_1_1_store.html)\n
+[优惠券相关接口](classapp_1_1index_1_1controller_1_1_coupon.html)\n
 
 
 \n

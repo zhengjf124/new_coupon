@@ -20,9 +20,9 @@ class Store extends Api
      *  city_id   | int   | 必填  | 城市ID
      *  page      | int   | 必填  | 页码
      *  list_rows | int   | 必填  | 一页的条数
-     *  trading_id| int   | 可选  | 商圈ID(没有时必须传0)
-     *  cat_id    | int   | 可选  | 分类ID(没有时必须传0)
-     *  sort_id   | int   | 可选  | 排序ID(没有时必须传0)
+     *  trading_id| int   | 可选  | 商圈ID
+     *  cat_id    | int   | 可选  | 分类ID
+     *  sort_id   | int   | 可选  | 排序ID
      *
      * @return
      *    name  |  type   | description
@@ -117,6 +117,7 @@ class Store extends Api
      * @param :
      *     name   | type   | null | description
      * -----------|--------|------|-------------
+     *    sign    | string | 必填  | 签名
      *  store_id  |  int   | 必须  | 商家ID
      *  passport  | string | 可选  | 用户票据(没有时必须传0)
      *
@@ -135,7 +136,7 @@ class Store extends Api
      *     label    | string |  标签
      *   keywords   | string |  关键字
      *   avg_price  | float  |  人均消费
-     * store_banner | string |  详情页图片
+     * store_banner | array |  详情页图片
      *  store_phone | string |  联系电话
      *    address   | string |  地址
      * comment_level|  int   |  评论等级 0-5，0代表无评论，1-5分别代表1到5颗星
@@ -151,9 +152,10 @@ class Store extends Api
      *  market_price| float  |  原价
      *  coupon_sales|  int   |  销量
      *   coupon_img |  int   |  列表引导图
+     *    is_res    |  int   |  是否预约 0-免预约，1-需要预约
      *
      * @note
-     * 测试地址：http://coupon.usrboot.com/home/store/detail/parameters/%7B%22store_id%22:%223%22%7D
+     *
      *
      */
     public function detail()
@@ -193,14 +195,39 @@ class Store extends Api
             }
         }
         //优惠券列表部分未完成
-        /*        $coupon_ids = M('coupons_store')->where(array('store_id' => $store_detail['store_id']))->getField('coupon_id', true);
-                if ($coupon_ids) {
-                    $coupon_list = M('coupons_sale')->where(array('coupon_id' => array('in', $coupon_ids), 'is_delete' => 0))->field('coupon_id,coupon_name,coupon_price,market_price,coupon_sales,coupon_img')->order('sort_order')->select();
-                }
-                if (!isset($coupon_list)) {
-                    $coupon_list = array();
-                }*/
-        $coupon_list = [];
+        $coupon_ids = $store_model->findCouponId($store_detail['store_id']);
+        $coupon_model = new \app\index\model\Coupon;
+        $coupon_list = $coupon_model->toSelect(['coupon_id' => array('in', $coupon_ids), 'is_delete' => 0, 'is_on_sale' => 1], 'coupon_id,coupon_name,coupon_price,market_price,coupon_sales,coupon_img,is_res', 0, 30);
         $this->_returnData(['store_detail' => $store_detail, 'coupon_list' => $coupon_list]);
+    }
+
+    /**
+     * 获取商家详细信息 \n
+     * URI : /store/sort
+     * @param :
+     *     name   | type   | null | description
+     * -----------|--------|------|-------------
+     *  sign      | string | 必填  | 签名
+     *
+     * @return
+     *      name   |  type  | description
+     * ------------|--------|----------------------
+     *    sort_id  |  int   |  排序ID
+     *   sort_name | string |  排序名称
+     *
+     */
+    public function getSort()
+    {
+        $data[0]['sort_id'] = 10;
+        $data[0]['sort_name'] = '离我最近';
+        $data[1]['sort_id'] = 20;
+        $data[1]['sort_name'] = '人气最高';
+        $data[2]['sort_id'] = 30;
+        $data[2]['sort_name'] = '评价最好';
+        $data[3]['sort_id'] = 40;
+        $data[3]['sort_name'] = '价格最高';
+        $data[4]['sort_id'] = 40;
+        $data[4]['sort_name'] = '价格最低';
+        $this->_returnData($data);
     }
 }

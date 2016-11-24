@@ -50,4 +50,24 @@ class Store extends Model
     {
         return Db::name('store')->where($where)->field($field)->find();
     }
+
+    /**
+     * 获取某个优惠券对应的门店ID（数组）
+     * @param int $coupon_id 优惠券ID
+     * @return array
+     */
+    public function findStoreId($coupon_id)
+    {
+        return Db::name('store_coupon')->where(['coupon_id' => $coupon_id])->column('store_id');
+    }
+
+    /**
+     * 获取某个门店对应的优惠券ID（数组）
+     * @param int $store_id 门店ID
+     * @return array
+     */
+    public function findCouponId($store_id)
+    {
+        return Db::name('store_coupon')->where(['store_id' => $store_id])->column('coupon_id');
+    }
 }

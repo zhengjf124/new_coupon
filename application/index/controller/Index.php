@@ -22,6 +22,14 @@ class Index extends Api
     public function test()
     {
 
+        //$this->_getRandomString();
+/*        for ($i = 0; $i <= 20000; $i++) {
+            Db::name('number')->insert(['number' => $this->_getRandomString(), 'add_time' => $this->_now]);
+        }*/
+
+        return Db::name('number')->count();
+        //echo 'ok';
+        exit;
         $a = "33,嘉峪关市
 34,金昌市
 35,白银市
@@ -435,8 +443,8 @@ class Index extends Api
 
         //return json($data);
         //foreach ($d as $v) {
-            //db('china_area_all')->insert();
-            //\think\Db::name('china_area_all')->insert(['area_id' => $v['area_id'], 'name' => $v['area_name']]);
+        //db('china_area_all')->insert();
+        //\think\Db::name('china_area_all')->insert(['area_id' => $v['area_id'], 'name' => $v['area_name']]);
         //}
         //return json($d);
     }
