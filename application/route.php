@@ -15,7 +15,7 @@ use think\Route;
 Route::rule('/', 'index/index/index');
 
 Route::rule([
-    '/test' => 'index/Index/test',
+    '/test' => 'index/Store/arraySort',
     '/category/onceList' => 'index/Category/onceList',
     '/category/secondList' => 'index/Category/secondList',
     '/user/sendNoteCode' => 'index/User/sendNoteCode',

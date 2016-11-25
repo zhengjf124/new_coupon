@@ -25,9 +25,10 @@ class Store extends Api
      *  sort_id   | int   | 可选  | 排序ID
      *
      * @return
-     *    name  |  type   | description
-     * ---------|---------|----------------------
-     *   list   |  array  |  商家列表
+     *    name    |  type   | description
+     * -----------|---------|----------------------
+     * total_page |   int   |  总页数
+     *   list     |  array  |  商家列表
      *
      * list :
      *      name     |  type  | description
@@ -39,6 +40,7 @@ class Store extends Api
      *  keywords     | string |  关键字
      *  avg_price    | float  |  人均消费
      *  store_img    | string |  列表引导图
+     *  sales        | int    |  销量
      *  comment_level| int    |  评论等级 0-5，0代表无评论，1-5分别代表1到5颗星
      *  distance     | string |  距离
      *
@@ -47,8 +49,6 @@ class Store extends Api
      */
     public function getList()
     {
-
-        //$param = $this->_createParameters('city_id,page,list_rows,trading_id,cat_id,sort_id');
         if (!preg_match('/^[1-9][0-9]*$/', $this->_getParams('city_id'))) {
             $this->_returnError(10020, '城市ID不合法');
         }
@@ -76,40 +76,40 @@ class Store extends Api
             $where['city_id'] = $this->_getParams('city_id');
         }
 
-        /*        if (!preg_match('/^[1-9][0-9]*$/', $this->_parameters['sort_id'])) {
-                    $this->_returnError(10042, '排序ID不合法');
-                }*/
-        //排序未完成
-        /*        switch ($this->_parameters['sort_id']) {
-                    case 2:
-
-                        break;
-                }*/
-
         $where['is_show'] = 1;
 
         $store_model = new \app\index\model\Store;
         $totalRows = $store_model->toCount($where);//总条数
         $totalPages = ceil($totalRows / $listRows);//总页数
-        if ($nowPage > $totalPages) {
+        if ($nowPage > $totalPages && $totalPages > 0) {
             $this->_returnError(10041, '页码超过了总页数');
         }
 
         $firstRow = $listRows * ($nowPage - 1);//从第几条开始查询
-        $field = 'store_id,store_name,comment_count,label,keywords,avg_price,store_img';
-        $list = $store_model->toSelect($where, $field, $firstRow, $listRows);
+        $field = 'store_id,store_name,comment_count,label,keywords,avg_price,store_img,sales';
+        $list = $store_model->toSelect($where, $field, '', '');
         $data['total_page'] = $totalPages;//总页数
         if (!is_array($list)) {
             $list = [];
         } else {
             foreach ($list as &$value) {
                 $value['comment_level'] = 3;//评论等级0-5 0代表 无评论 1-5分别代表1到5颗星
-                $value['distance'] = '<500m';//距离
+                $value['distance'] = '500';//距离
             }
+            unset($value);
         }
-        $data['list'] = $list;
+
+        $sort_id = $this->_getParams('sort_id');
+        if (!preg_match('/^[1-9][0-9]*$/', $sort_id)) {
+            $sort_id = 10;
+        }
+
+        $store_logic = new \app\index\logic\Store;
+        $list2 = $store_logic->toSort($list, $sort_id);
+        $data['list'] = $this->getArray($list2, $firstRow, $listRows);
         $this->_returnData($data);
     }
+
 
     /**
      * 获取商家详细信息 \n
@@ -194,7 +194,7 @@ class Store extends Api
                 }
             }
         }
-        //优惠券列表部分未完成
+
         $coupon_ids = $store_model->findCouponId($store_detail['store_id']);
         $coupon_model = new \app\index\model\Coupon;
         $coupon_list = $coupon_model->toSelect(['coupon_id' => array('in', $coupon_ids), 'is_delete' => 0, 'is_on_sale' => 1], 'coupon_id,coupon_name,coupon_price,market_price,coupon_sales,coupon_img,is_res', 0, 30);
@@ -226,7 +226,7 @@ class Store extends Api
         $data[2]['sort_name'] = '评价最好';
         $data[3]['sort_id'] = 40;
         $data[3]['sort_name'] = '价格最高';
-        $data[4]['sort_id'] = 40;
+        $data[4]['sort_id'] = 50;
         $data[4]['sort_name'] = '价格最低';
         $this->_returnData($data);
     }

@@ -149,6 +149,24 @@ class Api extends Controller
     }
 
     /**
+     * 获取数组的部分指定数据
+     * @param array $array
+     * @param int $firstRow
+     * @param int $listRows
+     */
+    protected function getArray($array, $firstRow, $listRows)
+    {
+        $finishRows = $firstRow + $listRows;
+        $arr = [];
+        for ($i = $firstRow; $i < $finishRows; $i++) {
+            if (isset($array[$i])) {
+                $arr[] = $array[$i];
+            }
+        }
+        return $arr;
+    }
+
+    /**
      * 模拟表单提交
      * @access protected
      * @param string $url 链接
