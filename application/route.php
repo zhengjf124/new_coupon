@@ -30,6 +30,7 @@ Route::rule([
     '/collect/store' => 'index/Collect/store',
     '/collect/coupon' => 'index/Collect/coupon',
     '/coupon/detail' => 'index/coupon/detail',
+    '/order/add' => 'index/Order/addCoupon',
 ], '');
 
 /*Route::pattern([

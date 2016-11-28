@@ -95,14 +95,19 @@ class Coupon extends Api
 
         $store_model = new \app\index\model\Store;
         $store_ids = $store_model->findStoreId($coupon_detail['coupon_id']);
-        $store_list = $store_model->toSelect(['store_id' => ['in', $store_ids]], 'store_id,store_name,comment_count,store_phone,address', 0, 20);
-        if ($store_list) {
-            foreach ($store_list as &$value) {
-                $value['comment_level'] = 3;//评论等级0-5 0代表 无评论 1-5分别代表1到5颗星
-                $value['distance'] = '<500m';//距离
+        if (empty($store_ids) === false) {
+            $store_list = $store_model->toSelect(['store_id' => ['in', $store_ids], 'is_show' => 1], 'store_id,store_name,comment_count,store_phone,address', 0, 20);
+            if ($store_list) {
+                foreach ($store_list as &$value) {
+                    $value['comment_level'] = 3;//评论等级0-5 0代表 无评论 1-5分别代表1到5颗星
+                    $value['distance'] = '<500m';//距离
+                }
+                unset($value);
             }
-            unset($value);
+        } else {
+            $store_list = [];
         }
+
 
         return json([
             'code' => 0,

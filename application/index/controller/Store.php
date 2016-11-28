@@ -128,31 +128,34 @@ class Store extends Api
      *  coupon_list |  array |  优惠券列表
      *
      * store_detail:
-     *      name    |  type  | description
-     * -------------|--------|----------------------
-     *    store_id  |  int   |  商家ID
-     *   store_name | string |  商家名称
-     * comment_count|  int   |  评论次数
-     *     label    | string |  标签
-     *   keywords   | string |  关键字
-     *   avg_price  | float  |  人均消费
-     * store_banner | array |  详情页图片
-     *  store_phone | string |  联系电话
-     *    address   | string |  地址
-     * comment_level|  int   |  评论等级 0-5，0代表无评论，1-5分别代表1到5颗星
-     *   distance   | string |  距离
-     *   collect    |  int   |  是否收藏 0-未收藏、1-已收藏
+     *      name      |  type  | description
+     * ---------------|--------|----------------------
+     *    store_id    |  int   |  商家ID
+     *   store_name   | string |  商家名称
+     * comment_count  |  int   |  评论次数
+     *     label      | string |  标签
+     *   keywords     | string |  关键字
+     *   avg_price    | float  |  人均消费
+     * store_banner   | array |  详情页图片
+     *  store_phone   | string |  联系电话
+     *    address     | string |  地址
+     * comment_level  |  int   |  评论等级 0-5，0代表无评论，1-5分别代表1到5颗星
+     *   distance     | string |  距离
+     *   collect      |  int   |  是否收藏 0-未收藏、1-已收藏
+     * mobile_pay_num |  int   |  手机买单数量
      *
      * coupon_list:
      *      name    |  type  | description
      * -------------|--------|----------------------
      *   coupon_id  |  int   |  优惠券ID
      *  coupon_name | string |  优惠券名称
+     *  coupon_desc | string |  优惠券描述
      *  coupon_price| float  |  优惠券价格
      *  market_price| float  |  原价
      *  coupon_sales|  int   |  销量
      *   coupon_img |  int   |  列表引导图
      *    is_res    |  int   |  是否预约 0-免预约，1-需要预约
+     *    subtract  |  float |  立减金额（0代表没有立减）
      *
      * @note
      *
@@ -178,8 +181,9 @@ class Store extends Api
             $store_detail['store_banner'] = [];
         }
         $store_detail['comment_level'] = 3;//评论等级0-5 0代表 无评论 1-5分别代表1到5颗星
-        $store_detail['distance'] = '<500m';//距离
+        $store_detail['distance'] = '500';//距离
         $store_detail['collect'] = 0;//未收藏
+        $store_detail['mobile_pay_num'] = 38;//手机买单数量
 
         $passport = $this->_getParams('passport');
         if (preg_match('/^[0-9a-zA-Z]{32}$/', $passport)) {
@@ -196,8 +200,13 @@ class Store extends Api
         }
 
         $coupon_ids = $store_model->findCouponId($store_detail['store_id']);
-        $coupon_model = new \app\index\model\Coupon;
-        $coupon_list = $coupon_model->toSelect(['coupon_id' => array('in', $coupon_ids), 'is_delete' => 0, 'is_on_sale' => 1], 'coupon_id,coupon_name,coupon_price,market_price,coupon_sales,coupon_img,is_res', 0, 30);
+        if (empty($coupon_ids) === false) {
+            $coupon_model = new \app\index\model\Coupon;
+            $coupon_list = $coupon_model->toSelect(['coupon_id' => ['in', $coupon_ids], 'is_delete' => 0, 'is_on_sale' => 1], 'coupon_id,coupon_name,coupon_desc,coupon_price,market_price,coupon_sales,coupon_img,is_res,subtract', 0, 30);
+
+        } else {
+            $coupon_list = [];
+        }
         $this->_returnData(['store_detail' => $store_detail, 'coupon_list' => $coupon_list]);
     }
 

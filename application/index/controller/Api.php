@@ -20,6 +20,8 @@ class Api extends Controller
         $this->_now = time();
     }
 
+
+
     /**
      * 获取参数
      * @param string $key 键
