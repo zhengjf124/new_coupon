@@ -3,28 +3,29 @@ namespace app\index\controller;
 
 class Common extends Api
 {
-    protected $user_id;//用户ID
+
+    private $_parameters;//参数
 
     public function _initialize()
     {
+
         parent::_initialize();
-        $this->user_id = $this->_checkPassport($this->_getParams('passport'));
+        $this->_parameters = $this->_createParameters();//获取参数
     }
 
+
     /**
-     * 验证passport 返回登录的用户ID
-     * @return mixed
+     * 获取参数
+     * @param string $key 键
+     * @return null
      */
-    private function _checkPassport($passport)
+    protected function _getParams($key)
     {
-        if (!preg_match('/^[0-9a-zA-Z]{32}$/', $passport)) {
-            $this->_returnError('10010', 'passport不合法');
+        if (isset($this->_parameters[$key])) {
+            return $this->_parameters[$key];
+        } else {
+            return null;
         }
-        $passport_model = new \app\index\model\Passport;
-        $user_id = $passport_model->findUserId($passport);
-        if (preg_match('/^[1-9]\d*$/', $user_id)) {
-            return $user_id;
-        }
-        $this->_returnError('10010', 'passport不合法');
     }
+
 }

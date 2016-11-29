@@ -1,7 +1,7 @@
 <?php
 namespace app\index\controller;
 
-class Coupon extends Api
+class Coupon extends Common
 {
     public function _initialize()
     {
@@ -15,6 +15,7 @@ class Coupon extends Api
      * @param :
      *     name   | type   | null | description
      * -----------|--------|------|-------------
+     *    sign    | string | 必填  | 签名
      *  coupon_id |  int   | 必须  | 优惠券ID
      *  passport  | string | 可选  | 用户票据
      *
@@ -29,6 +30,7 @@ class Coupon extends Api
      * -------------|--------|----------------------
      * coupon_id    | int    |  优惠券ID
      * coupon_name  | string |  优惠券名称
+     * coupon_img   | string |  优惠券列表引导图
      * coupon_desc  | string |  描述
      * market_price | decimal|  原价
      * coupon_price | decimal|  实际价格
@@ -38,6 +40,9 @@ class Coupon extends Api
      * use_rule     | string |  使用规则
      * collect      | int    |  是否收藏 0-未收藏、1-已收藏
      * validity     | string |  有效期
+     * is_on_sale   | int    |  是否下架 0-已下架 1-上架
+     * comment_count| int    |  评论次数
+     * stand_by     | decimal|  立减金额
      *
      * store_list:
      *      name    |  type  | description
@@ -62,12 +67,13 @@ class Coupon extends Api
 
         $coupon_model = new \app\index\model\Coupon;
         $where = ['coupon_id' => $coupon_id, 'is_delete' => 0];
-        $field = 'coupon_id,coupon_name,coupon_desc,market_price,coupon_price,coupon_sales,coupon_banner,start_time,end_time,use_time,use_rule,validity_remarks';
+        $field = 'coupon_id,coupon_name,coupon_img,coupon_desc,market_price,coupon_price,coupon_sales,coupon_banner,start_time,end_time,use_time,use_rule,validity_remarks,is_on_sale,comment_count,stand_by';
         $coupon_detail = $coupon_model->toFind($where, $field);
 
         if (!$coupon_detail || !is_array($coupon_detail)) {
             $this->_returnError(10045, '优惠券不存在');
         }
+
         $coupon_detail['use_rule'] = htmlspecialchars_decode($coupon_detail['use_rule']);
         $coupon_detail['coupon_banner'] = json_decode($coupon_detail['coupon_banner']);
         $coupon_detail['collect'] = 0;//未收藏
@@ -100,14 +106,13 @@ class Coupon extends Api
             if ($store_list) {
                 foreach ($store_list as &$value) {
                     $value['comment_level'] = 3;//评论等级0-5 0代表 无评论 1-5分别代表1到5颗星
-                    $value['distance'] = '<500m';//距离
+                    $value['distance'] = '500';//距离
                 }
                 unset($value);
             }
         } else {
             $store_list = [];
         }
-
 
         return json([
             'code' => 0,

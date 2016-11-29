@@ -5,7 +5,7 @@ namespace app\index\controller;
  * Class pay
  * @package app\index\controller
  */
-class Pay extends Common
+class Pay extends Member
 {
     public function _initialize()
     {

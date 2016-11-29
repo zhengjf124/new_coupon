@@ -29,8 +29,14 @@ Route::rule([
     '/store/sort' => 'index/store/getSort',
     '/collect/store' => 'index/Collect/store',
     '/collect/coupon' => 'index/Collect/coupon',
+    '/collect/store/list' => 'index/Collect/storeList',
+    '/collect/coupon/list' => 'index/Collect/couponList',
     '/coupon/detail' => 'index/coupon/detail',
     '/order/add' => 'index/Order/addCoupon',
+    '/callback/alipay' => 'index/Callback/aliPay',
+    '/member/coupon/list' => 'index/Member/couponList',
+    '/member/coupon/detail' => 'index/Member/couponDetail',
+    '/comment/add' => 'index/Comment/addComment',
 ], '');
 
 /*Route::pattern([

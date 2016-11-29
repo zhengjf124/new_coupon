@@ -3,7 +3,7 @@
 namespace app\index\controller;
 
 
-class Store extends Api
+class Store extends Common
 {
     public function _initialize()
     {
@@ -155,7 +155,7 @@ class Store extends Api
      *  coupon_sales|  int   |  销量
      *   coupon_img |  int   |  列表引导图
      *    is_res    |  int   |  是否预约 0-免预约，1-需要预约
-     *    subtract  |  float |  立减金额（0代表没有立减）
+     *    stand_by  |  float |  立减金额（0代表没有立减）
      *
      * @note
      *
@@ -202,7 +202,7 @@ class Store extends Api
         $coupon_ids = $store_model->findCouponId($store_detail['store_id']);
         if (empty($coupon_ids) === false) {
             $coupon_model = new \app\index\model\Coupon;
-            $coupon_list = $coupon_model->toSelect(['coupon_id' => ['in', $coupon_ids], 'is_delete' => 0, 'is_on_sale' => 1], 'coupon_id,coupon_name,coupon_desc,coupon_price,market_price,coupon_sales,coupon_img,is_res,subtract', 0, 30);
+            $coupon_list = $coupon_model->toSelect(['coupon_id' => ['in', $coupon_ids], 'is_delete' => 0, 'is_on_sale' => 1], 'coupon_id,coupon_name,coupon_desc,coupon_price,market_price,coupon_sales,coupon_img,is_res,stand_by', 0, 30);
 
         } else {
             $coupon_list = [];

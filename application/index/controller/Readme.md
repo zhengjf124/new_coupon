@@ -43,6 +43,8 @@ shop基本约定，接口使用http协议get/post请求，返回数据均使用J
 [收藏接口](classapp_1_1index_1_1controller_1_1_collect.html)\n
 [门店相关接口](classapp_1_1index_1_1controller_1_1_store.html)\n
 [优惠券相关接口](classapp_1_1index_1_1controller_1_1_coupon.html)\n
+[订单相关接口](classapp_1_1index_1_1controller_1_1_order.html)\n
+[个人中心相关接口](classapp_1_1index_1_1controller_1_1_member.html)\n
 
 
 \n
@@ -129,6 +131,14 @@ shop基本约定，接口使用http协议get/post请求，返回数据均使用J
 10046       一页条数不合法
 
 10047       优惠券数量不合法
+
+10048       优惠券使用状态不合法
+
+10049       优惠券类型不合法
+
+10050       该优惠券已下架
+
+10051       优惠券编号不合法
 
 
 

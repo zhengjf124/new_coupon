@@ -3,7 +3,7 @@ namespace app\index\controller;
 
 require_once(APP_PATH . 'index/lib/alidayu/TopSdk.php');
 
-class User extends Api
+class User extends Common
 {
     public function _initialize()
     {
@@ -115,7 +115,7 @@ class User extends Api
         }
 
         $data['pwd_key'] = $this->_getRandomString(8);//获取8位随机数
-        $data['nick_name'] = '匿名用户';
+        $data['user_name'] = '匿名用户';
         $data['mobile'] = $this->_getParams('mobile');
         $data['password'] = $logic_user->passwordEncryption($this->_getParams('password'), $data['pwd_key']);
         $data['nick_name'] = $this->_getParams('mobile');
@@ -123,7 +123,7 @@ class User extends Api
         $data['reg_time'] = $this->_now;
         $data['last_login'] = $this->_now;
         $data['login_count'] = 1;
-        $data['last_ip'] = $logic_user->getIP();//获取IP地址
+        $data['last_ip'] = $this->getIP();//获取IP地址
         //添加数据库
         $user_id = $model_user->toAdd($data);
         $passport_model = new \app\index\model\Passport;

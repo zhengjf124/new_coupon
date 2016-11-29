@@ -5,7 +5,7 @@ namespace app\index\controller;
  * Class Order
  * @package app\index\controller
  */
-class Order extends Common
+class Order extends Member
 {
     public function _initialize()
     {
@@ -21,6 +21,7 @@ class Order extends Common
      *  sign      | string | 必填 | 签名
      *  passport  | string | 必填 | 用户登录凭证
      *  coupon_id | int    | 必填 | 优惠券ID
+     *  coupon_num| int    | 必填 | 优惠券数量
      *
      * @return
      *  name     |  type  | description
@@ -42,12 +43,17 @@ class Order extends Common
 
         $coupon_model = new \app\index\model\Coupon;
         $where = ['coupon_id' => $coupon_id, 'is_delete' => 0];
-        $field = 'coupon_id,coupon_name,coupon_title,coupon_desc,market_price,coupon_price,coupon_img,original_img,is_res,full,subtract,type,start_time,end_time,use_time,use_rule,validity_remarks,stand_by';
+        $field = 'coupon_id,coupon_name,coupon_title,coupon_desc,market_price,coupon_price,coupon_img,original_img,is_res,full,subtract,type,start_time,end_time,use_time,use_rule,validity_remarks,stand_by,is_on_sale';
         $coupon_info = $coupon_model->toFind($where, $field);
 
         if (!$coupon_info || !is_array($coupon_info) || empty($coupon_info)) {
             $this->_returnError(10045, '优惠券不存在');
         }
+
+        if ($coupon_info['is_on_sale'] != 1) {
+            $this->_returnError(10050, '该优惠券已下架');
+        }
+        unset($coupon_info['is_on_sale']);
 
         $coupon_info['add_time'] = $this->_now;
         //优惠券总金额(已扣掉立减金额)
@@ -59,7 +65,8 @@ class Order extends Common
         $data['user_id'] = $this->user_id; //用户ID
         $data['order_amount'] = $coupon_money; //应付金额
         $data['add_time'] = $this->_now; //下单时间
-
+        $store_model = new \app\index\model\Store;
+        $data['store_id'] = json_encode($store_model->findStoreId($coupon_id));
         $order_model = new \app\index\model\Order;
         $order_id = $order_model->toAddOrder($data);
         if ($order_id) {

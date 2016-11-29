@@ -71,4 +71,26 @@ class Collect extends Model
     {
         return Db::name('coupon_collect')->insert($data);
     }
+
+    /**
+     * 获取优惠券收藏列表
+     * @param array $where 查询条件
+     * @param string $field 需要查询的字段
+     * @return false|\PDOStatement|string|\think\Collection
+     */
+    public function selectCoupon($where, $field)
+    {
+        return Db::name('coupon_collect')->where($where)->field($field)->select();
+    }
+
+    /**
+     * 获取门店收藏列表
+     * @param array $where 查询条件
+     * @param string $field 需要查询的字段
+     * @return false|\PDOStatement|string|\think\Collection
+     */
+    public function selectStore($where, $field)
+    {
+        return Db::name('store_collect')->where($where)->field($field)->select();
+    }
 }

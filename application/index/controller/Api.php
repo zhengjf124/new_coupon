@@ -10,30 +10,13 @@ use think\Request;
 class Api extends Controller
 {
     protected $_now;//当前时间
-    private $_parameters;//参数
 
     public function _initialize()
     {
         parent::_initialize();
         header("Access-Control-Allow-Origin: *");//允许跨域
-        $this->_parameters = $this->_createParameters();//获取参数
+
         $this->_now = time();
-    }
-
-
-
-    /**
-     * 获取参数
-     * @param string $key 键
-     * @return null
-     */
-    protected function _getParams($key)
-    {
-        if (isset($this->_parameters[$key])) {
-            return $this->_parameters[$key];
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -46,22 +29,22 @@ class Api extends Controller
     protected function _createParameters()
     {
         //获取所有数据
-        $data = Request::instance()->param();
-        if (!isset($data['sign'])) {
+        $param = Request::instance()->param();
+        if (!isset($param['sign'])) {
             $this->_returnError(10001, 'sign不合法');
         }
-        unset($data['sign']);
-        $param = $data;
-        $param['token'] = AUTH_KEY;
+        unset($param['sign']);
+
         ksort($param);//根据键值升序排列
+
         $sign = '';
         foreach ($param as $value) {
             $sign .= $value . '&';
         }
+
+        $sign .= AUTH_KEY;
         $sign = trim($sign, '&');
         $sys_sign = md5($sign);
-        unset($param['token']);
-
         $user_sign = Request::instance()->param('sign', '');
 
         if ($sys_sign != $user_sign) {
@@ -148,6 +131,25 @@ class Api extends Controller
             $s .= $str[rand(0, $len)];
         }
         return $s;
+    }
+
+    /**
+     * 获取IP地址
+     * @access public
+     * @since 1.0
+     * @return string
+     */
+    protected function getIP()
+    {
+        global $ip;
+        if (getenv("HTTP_CLIENT_IP"))
+            $ip = getenv("HTTP_CLIENT_IP");
+        else if (getenv("HTTP_X_FORWARDED_FOR"))
+            $ip = getenv("HTTP_X_FORWARDED_FOR");
+        else if (getenv("REMOTE_ADDR"))
+            $ip = getenv("REMOTE_ADDR");
+        else $ip = '';
+        return $ip;
     }
 
     /**

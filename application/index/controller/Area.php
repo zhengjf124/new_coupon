@@ -2,7 +2,7 @@
 
 namespace app\index\controller;
 
-class Area extends Api
+class Area extends Common
 {
     public function _initialize()
     {

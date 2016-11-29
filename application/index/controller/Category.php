@@ -6,7 +6,7 @@ namespace app\index\controller;
  * Class Category
  * @package app\index\controller
  */
-class Category extends Api
+class Category extends Common
 {
     public function _initialize()
     {
